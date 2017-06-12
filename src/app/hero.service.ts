@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/map';
 
 import { Hero } from './hero';
 
@@ -35,7 +37,7 @@ export class HeroService {
       .catch(this.handleError);
   }
 
-  create(name: String): Promise<Hero> {
+  create(name: string): Promise<Hero> {
     let hero = { name: name };
     return this.http
       .post(this.heroesUrl, JSON.stringify(hero), {headers: this.headers})
@@ -51,6 +53,13 @@ export class HeroService {
       .toPromise()
       .then(() => id)
       .catch(this.handleError)
+  }
+
+  search(term: string): Observable<Hero[]> {
+    const url = `${this.heroesUrl}/?name=${term}`;
+    return this.http
+      .get(url)
+      .map(response => response.json().data as Hero[]);
   }
 
   private handleError(error: any): Promise<any> {
